@@ -15,8 +15,8 @@
 .stud {
     stroke-width: 1px;
     stroke: aliceblue;
-    fill: #888;
     fill-opacity: 0;
+    /* visibility: hidden; */
 }
 
 .stud:hover {

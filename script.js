@@ -1,5 +1,6 @@
 const svgNS = "http://www.w3.org/2000/svg";
 const thread_offset = 1;
+const mult = 10;
 
 let frame = document.getElementById('frame');
 
@@ -11,12 +12,11 @@ function create_stud(
     thread_lenght,
     axis_top,
     face_left,
+    end_champfer_lenght = thread_offset,
     withdrawal = 1,
     axis_overflow = 50,
     face_overflow = 20,
 ) {
-
-    let mult = 20;
 
     base_lenght *= mult;
     nominal_lenght *= mult;
@@ -24,6 +24,7 @@ function create_stud(
     base_diameter *= mult;
     withdrawal *= mult
     thread_lenght *= mult
+    end_champfer_lenght *= mult;
 
     let face1 = document.createElementNS(svgNS, "line");
     face1.setAttribute("x1", face_left);
@@ -132,11 +133,18 @@ function create_stud(
     end_nominal_thread.setAttribute("class", "stud thread");
 
     let end_nominal_thread_upper_champfer = document.createElementNS(svgNS, "line");
-    end_nominal_thread_upper_champfer.setAttribute("x1", face_left + nominal_lenght - thread_lenght);
-    end_nominal_thread_upper_champfer.setAttribute("y1", axis_top + nominal_diameter * 0.5);
+    end_nominal_thread_upper_champfer.setAttribute("x1", face_left + nominal_lenght - thread_lenght - end_champfer_lenght);
+    end_nominal_thread_upper_champfer.setAttribute("y1", axis_top - nominal_diameter * 0.5);
     end_nominal_thread_upper_champfer.setAttribute("x2", face_left + nominal_lenght - thread_lenght);
-    end_nominal_thread_upper_champfer.setAttribute("y2", axis_top - nominal_diameter * 0.5);
+    end_nominal_thread_upper_champfer.setAttribute("y2", axis_top - nominal_diameter * 0.5 + thread_offset * mult);
     end_nominal_thread_upper_champfer.setAttribute("class", "stud thread");
+
+    let end_nominal_thread_lower_champfer = document.createElementNS(svgNS, "line");
+    end_nominal_thread_lower_champfer.setAttribute("x1", face_left + nominal_lenght - thread_lenght - end_champfer_lenght);
+    end_nominal_thread_lower_champfer.setAttribute("y1", axis_top + nominal_diameter * 0.5);
+    end_nominal_thread_lower_champfer.setAttribute("x2", face_left + nominal_lenght - thread_lenght);
+    end_nominal_thread_lower_champfer.setAttribute("y2", axis_top + nominal_diameter * 0.5 - thread_offset * mult);
+    end_nominal_thread_lower_champfer.setAttribute("class", "stud thread");
 
     frame.appendChild(polyline);
     frame.appendChild(axis);
@@ -151,6 +159,7 @@ function create_stud(
     frame.appendChild(lower_nominal_thread);
     frame.appendChild(end_nominal_thread);
     frame.appendChild(end_nominal_thread_upper_champfer);
+    frame.appendChild(end_nominal_thread_lower_champfer);
 };
 
 const nominal_diameter = 8;
