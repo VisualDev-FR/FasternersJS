@@ -1,183 +1,240 @@
 const svgNS = "http://www.w3.org/2000/svg";
-const thread_offset = 1;
-const mult = 10;
+
+
 
 let frame = document.getElementById('frame');
 
-function create_stud(
-    nominal_diameter,
-    base_diameter,
-    base_lenght,
-    nominal_lenght,
-    thread_lenght,
-    axis_top,
-    face_left,
-    end_champfer_lenght = thread_offset,
-    withdrawal = 1,
-    axis_overflow = 50,
-    face_overflow = 20,
-) {
+class Shape {
+    THREAD_OFFSET = 1;
+    SCALE = 30;
+    AXIS_TOP = 250;
+    FACE_LEFT = 800;
+    AXIS_OVERFLOW = 0;
+    FACE_OVERFLOW = 20;
+}
 
-    base_lenght *= mult;
-    nominal_lenght *= mult;
-    nominal_diameter *= mult;
-    base_diameter *= mult;
-    withdrawal *= mult
-    thread_lenght *= mult
-    end_champfer_lenght *= mult;
+class Stud extends Shape {
 
-    let face1 = document.createElementNS(svgNS, "line");
-    face1.setAttribute("x1", face_left);
-    face1.setAttribute("y1", axis_top - Math.max(nominal_diameter, base_diameter) * 0.5 - face_overflow);
-    face1.setAttribute("x2", face_left);
-    face1.setAttribute("y2", axis_top - nominal_diameter * 0.5);
-    face1.setAttribute("class", "stud face");
+    constructor(
+        nominal_diameter,
+        base_diameter,
+        base_lenght,
+        nominal_lenght,
+        thread_lenght,
+        end_champfer_lenght = this.THREAD_OFFSET,
+        withdrawal = 1,
+    ) {
+        super();
 
-    let face2 = document.createElementNS(svgNS, "line");
-    face2.setAttribute("x1", face_left);
-    face2.setAttribute("y1", axis_top + nominal_diameter * 0.5);
-    face2.setAttribute("x2", face_left);
-    face2.setAttribute("y2", axis_top + Math.max(nominal_diameter, base_diameter) * 0.5 + face_overflow);
-    face2.setAttribute("class", "stud face");
+        this.base_lenght = base_lenght * this.SCALE;
+        this.nominal_lenght = nominal_lenght * this.SCALE;
+        this.nominal_diameter = nominal_diameter * this.SCALE;
+        this.base_diameter = base_diameter * this.SCALE;
+        this.withdrawal = withdrawal * this.SCALE;
+        this.thread_lenght = thread_lenght * this.SCALE;
+        this.end_champfer_lenght = end_champfer_lenght * this.SCALE;
+    }
 
-    face_left -= withdrawal;
+    draw_main_shape(element) {
 
-    let axis = document.createElementNS(svgNS, "line");
-    axis.setAttribute("x1", face_left - base_lenght - axis_overflow);
-    axis.setAttribute("y1", axis_top);
-    axis.setAttribute("x2", face_left + nominal_lenght + axis_overflow);
-    axis.setAttribute("y2", axis_top);
-    axis.setAttribute("class", "stud axis");
-    axis.setAttribute("stroke-dasharray", "15,5 5,5")
+        let face_left = this.FACE_LEFT - this.withdrawal;
 
-    let P1 = [
-        face_left,
-        axis_top - 0.5 * base_diameter
-    ];
+        let P1 = [
+            face_left,
+            this.AXIS_TOP - 0.5 * this.base_diameter
+        ];
 
-    let P2 = [
-        face_left,
-        axis_top - 0.5 * nominal_diameter
-    ];
+        let P2 = [
+            face_left,
+            this.AXIS_TOP - 0.5 * this.nominal_diameter
+        ];
 
-    let P3 = [
-        face_left + nominal_lenght,
-        axis_top - 0.5 * nominal_diameter,
-    ];
+        let P3 = [
+            face_left + this.nominal_lenght,
+            this.AXIS_TOP - 0.5 * this.nominal_diameter,
+        ];
 
-    let P4 = [
-        face_left + nominal_lenght,
-        axis_top + 0.5 * nominal_diameter,
-    ];
+        let P4 = [
+            face_left + this.nominal_lenght,
+            this.AXIS_TOP + 0.5 * this.nominal_diameter,
+        ];
 
-    let P5 = [
-        face_left,
-        axis_top + 0.5 * nominal_diameter,
-    ];
+        let P5 = [
+            face_left,
+            this.AXIS_TOP + 0.5 * this.nominal_diameter,
+        ];
 
-    let P6 = [
-        face_left,
-        axis_top + 0.5 * base_diameter,
-    ];
+        let P6 = [
+            face_left,
+            this.AXIS_TOP + 0.5 * this.base_diameter,
+        ];
 
-    let P7 = [
-        face_left - base_lenght,
-        axis_top + 0.5 * base_diameter,
-    ];
+        let P7 = [
+            face_left - this.base_lenght,
+            this.AXIS_TOP + 0.5 * this.base_diameter,
+        ];
 
-    let P8 = [
-        face_left - base_lenght,
-        axis_top - 0.5 * base_diameter,
-    ];
+        let P8 = [
+            face_left - this.base_lenght,
+            this.AXIS_TOP - 0.5 * this.base_diameter,
+        ];
 
-    let points = [P1, P2, P3, P4, P5, P6, P7, P8, P1];
+        let points = [P1, P2, P3, P4, P5, P6, P7, P8, P1];
 
-    // Définir l'attribut "points" de la polyline
-    let polyline = document.createElementNS(svgNS, "polyline");
-    polyline.setAttribute("points", points);
-    polyline.setAttribute("class", "stud");
+        // Définir l'attribut "points" de la polyline
+        let main_shape = document.createElementNS(svgNS, "polyline");
+        main_shape.setAttribute("points", points);
+        main_shape.setAttribute("class", "stud");
 
-    let upper_base_thread = document.createElementNS(svgNS, "line");
-    upper_base_thread.setAttribute("x1", face_left - base_lenght);
-    upper_base_thread.setAttribute("y1", axis_top - base_diameter * 0.5 + thread_offset * mult);
-    upper_base_thread.setAttribute("x2", face_left);
-    upper_base_thread.setAttribute("y2", axis_top - base_diameter * 0.5 + thread_offset * mult);
-    upper_base_thread.setAttribute("class", "stud thread");
+        element.appendChild(main_shape);
+    }
 
-    let lower_base_thread = document.createElementNS(svgNS, "line");
-    lower_base_thread.setAttribute("x1", face_left - base_lenght);
-    lower_base_thread.setAttribute("y1", axis_top + base_diameter * 0.5 - thread_offset * mult);
-    lower_base_thread.setAttribute("x2", face_left);
-    lower_base_thread.setAttribute("y2", axis_top + base_diameter * 0.5 - thread_offset * mult);
-    lower_base_thread.setAttribute("class", "stud thread");
+    draw_faces(element) {
 
-    let upper_nominal_thread = document.createElementNS(svgNS, "line");
-    upper_nominal_thread.setAttribute("x1", face_left + nominal_lenght - thread_lenght);
-    upper_nominal_thread.setAttribute("y1", axis_top - nominal_diameter * 0.5 + thread_offset * mult);
-    upper_nominal_thread.setAttribute("x2", face_left + nominal_lenght);
-    upper_nominal_thread.setAttribute("y2", axis_top - nominal_diameter * 0.5 + thread_offset * mult);
-    upper_nominal_thread.setAttribute("class", "stud thread");
+        let face1 = document.createElementNS(svgNS, "line");
+        face1.setAttribute("x1", this.FACE_LEFT);
+        face1.setAttribute("y1", this.AXIS_TOP - Math.max(this.nominal_diameter, this.base_diameter) * 0.5 - this.FACE_OVERFLOW);
+        face1.setAttribute("x2", this.FACE_LEFT);
+        face1.setAttribute("y2", this.AXIS_TOP - this.nominal_diameter * 0.5);
+        face1.setAttribute("class", "stud face");
 
-    let lower_nominal_thread = document.createElementNS(svgNS, "line");
-    lower_nominal_thread.setAttribute("x1", face_left + nominal_lenght - thread_lenght);
-    lower_nominal_thread.setAttribute("y1", axis_top + nominal_diameter * 0.5 - thread_offset * mult);
-    lower_nominal_thread.setAttribute("x2", face_left + nominal_lenght);
-    lower_nominal_thread.setAttribute("y2", axis_top + nominal_diameter * 0.5 - thread_offset * mult);
-    lower_nominal_thread.setAttribute("class", "stud thread");
+        let face2 = document.createElementNS(svgNS, "line");
+        face2.setAttribute("x1", this.FACE_LEFT);
+        face2.setAttribute("y1", this.AXIS_TOP + this.nominal_diameter * 0.5);
+        face2.setAttribute("x2", this.FACE_LEFT);
+        face2.setAttribute("y2", this.AXIS_TOP + Math.max(this.nominal_diameter, this.base_diameter) * 0.5 + this.FACE_OVERFLOW);
+        face2.setAttribute("class", "stud face");
 
-    let end_nominal_thread = document.createElementNS(svgNS, "line");
-    end_nominal_thread.setAttribute("x1", face_left + nominal_lenght - thread_lenght);
-    end_nominal_thread.setAttribute("y1", axis_top + nominal_diameter * 0.5);
-    end_nominal_thread.setAttribute("x2", face_left + nominal_lenght - thread_lenght);
-    end_nominal_thread.setAttribute("y2", axis_top - nominal_diameter * 0.5);
-    end_nominal_thread.setAttribute("class", "stud thread");
+        element.appendChild(face1);
+        element.appendChild(face2);
+    }
 
-    let end_nominal_thread_upper_champfer = document.createElementNS(svgNS, "line");
-    end_nominal_thread_upper_champfer.setAttribute("x1", face_left + nominal_lenght - thread_lenght - end_champfer_lenght);
-    end_nominal_thread_upper_champfer.setAttribute("y1", axis_top - nominal_diameter * 0.5);
-    end_nominal_thread_upper_champfer.setAttribute("x2", face_left + nominal_lenght - thread_lenght);
-    end_nominal_thread_upper_champfer.setAttribute("y2", axis_top - nominal_diameter * 0.5 + thread_offset * mult);
-    end_nominal_thread_upper_champfer.setAttribute("class", "stud thread");
+    draw_axis(element) {
 
-    let end_nominal_thread_lower_champfer = document.createElementNS(svgNS, "line");
-    end_nominal_thread_lower_champfer.setAttribute("x1", face_left + nominal_lenght - thread_lenght - end_champfer_lenght);
-    end_nominal_thread_lower_champfer.setAttribute("y1", axis_top + nominal_diameter * 0.5);
-    end_nominal_thread_lower_champfer.setAttribute("x2", face_left + nominal_lenght - thread_lenght);
-    end_nominal_thread_lower_champfer.setAttribute("y2", axis_top + nominal_diameter * 0.5 - thread_offset * mult);
-    end_nominal_thread_lower_champfer.setAttribute("class", "stud thread");
+        let face_left = this.FACE_LEFT - this.withdrawal;
 
-    frame.appendChild(polyline);
-    frame.appendChild(axis);
+        let axis = document.createElementNS(svgNS, "line");
+        axis.setAttribute("x1", face_left - this.base_lenght - this.AXIS_OVERFLOW);
+        axis.setAttribute("y1", this.AXIS_TOP);
+        axis.setAttribute("x2", face_left + this.nominal_lenght + this.AXIS_OVERFLOW);
+        axis.setAttribute("y2", this.AXIS_TOP);
+        axis.setAttribute("class", "stud axis");
+        axis.setAttribute("stroke-dasharray", "15,5 5,5")
 
-    frame.appendChild(face1);
-    frame.appendChild(face2);
+        element.appendChild(axis);
+    }
 
-    frame.appendChild(upper_base_thread);
-    frame.appendChild(lower_base_thread);
+    draw_base_thread(element) {
 
-    frame.appendChild(upper_nominal_thread);
-    frame.appendChild(lower_nominal_thread);
-    frame.appendChild(end_nominal_thread);
-    frame.appendChild(end_nominal_thread_upper_champfer);
-    frame.appendChild(end_nominal_thread_lower_champfer);
+        let face_left = this.FACE_LEFT - this.withdrawal;
+        let base_diameter = this.base_diameter;
+        let thread_offset = this.THREAD_OFFSET;
+        let base_lenght = this.base_lenght;
+        let axis_top = this.AXIS_TOP;
+
+        let upper_base_thread = document.createElementNS(svgNS, "line");
+        upper_base_thread.setAttribute("x1", face_left - base_lenght);
+        upper_base_thread.setAttribute("y1", axis_top - base_diameter * 0.5 + thread_offset * this.SCALE);
+        upper_base_thread.setAttribute("x2", face_left);
+        upper_base_thread.setAttribute("y2", axis_top - base_diameter * 0.5 + thread_offset * this.SCALE);
+        upper_base_thread.setAttribute("class", "stud thread");
+
+        let lower_base_thread = document.createElementNS(svgNS, "line");
+        lower_base_thread.setAttribute("x1", face_left - base_lenght);
+        lower_base_thread.setAttribute("y1", axis_top + base_diameter * 0.5 - thread_offset * this.SCALE);
+        lower_base_thread.setAttribute("x2", face_left);
+        lower_base_thread.setAttribute("y2", axis_top + base_diameter * 0.5 - thread_offset * this.SCALE);
+        lower_base_thread.setAttribute("class", "stud thread");
+
+        element.appendChild(upper_base_thread);
+        element.appendChild(lower_base_thread);
+    }
+
+    draw_nominal_thread(element) {
+
+        let face_left = this.FACE_LEFT - this.withdrawal;
+        let thread_offset = this.THREAD_OFFSET;
+        let axis_top = this.AXIS_TOP;
+        let nominal_lenght = this.nominal_lenght;
+        let thread_lenght = this.thread_lenght;
+        let nominal_diameter = this.nominal_diameter;
+        let end_champfer_lenght = this.end_champfer_lenght;
+
+        let upper_nominal_thread = document.createElementNS(svgNS, "line");
+        upper_nominal_thread.setAttribute("x1", face_left + nominal_lenght - thread_lenght);
+        upper_nominal_thread.setAttribute("y1", axis_top - nominal_diameter * 0.5 + thread_offset * this.SCALE);
+        upper_nominal_thread.setAttribute("x2", face_left + nominal_lenght);
+        upper_nominal_thread.setAttribute("y2", axis_top - nominal_diameter * 0.5 + thread_offset * this.SCALE);
+        upper_nominal_thread.setAttribute("class", "stud thread");
+
+        let lower_nominal_thread = document.createElementNS(svgNS, "line");
+        lower_nominal_thread.setAttribute("x1", face_left + nominal_lenght - thread_lenght);
+        lower_nominal_thread.setAttribute("y1", axis_top + nominal_diameter * 0.5 - thread_offset * this.SCALE);
+        lower_nominal_thread.setAttribute("x2", face_left + nominal_lenght);
+        lower_nominal_thread.setAttribute("y2", axis_top + nominal_diameter * 0.5 - thread_offset * this.SCALE);
+        lower_nominal_thread.setAttribute("class", "stud thread");
+
+        let end_nominal_thread = document.createElementNS(svgNS, "line");
+        end_nominal_thread.setAttribute("x1", face_left + nominal_lenght - thread_lenght);
+        end_nominal_thread.setAttribute("y1", axis_top + nominal_diameter * 0.5);
+        end_nominal_thread.setAttribute("x2", face_left + nominal_lenght - thread_lenght);
+        end_nominal_thread.setAttribute("y2", axis_top - nominal_diameter * 0.5);
+        end_nominal_thread.setAttribute("class", "stud thread");
+
+        let end_nominal_thread_upper_champfer = document.createElementNS(svgNS, "line");
+        end_nominal_thread_upper_champfer.setAttribute("x1", face_left + nominal_lenght - thread_lenght - end_champfer_lenght);
+        end_nominal_thread_upper_champfer.setAttribute("y1", axis_top - nominal_diameter * 0.5);
+        end_nominal_thread_upper_champfer.setAttribute("x2", face_left + nominal_lenght - thread_lenght);
+        end_nominal_thread_upper_champfer.setAttribute("y2", axis_top - nominal_diameter * 0.5 + thread_offset * this.SCALE);
+        end_nominal_thread_upper_champfer.setAttribute("class", "stud thread");
+
+        let end_nominal_thread_lower_champfer = document.createElementNS(svgNS, "line");
+        end_nominal_thread_lower_champfer.setAttribute("x1", face_left + nominal_lenght - thread_lenght - end_champfer_lenght);
+        end_nominal_thread_lower_champfer.setAttribute("y1", axis_top + nominal_diameter * 0.5);
+        end_nominal_thread_lower_champfer.setAttribute("x2", face_left + nominal_lenght - thread_lenght);
+        end_nominal_thread_lower_champfer.setAttribute("y2", axis_top + nominal_diameter * 0.5 - thread_offset * this.SCALE);
+        end_nominal_thread_lower_champfer.setAttribute("class", "stud thread");
+
+        element.appendChild(upper_nominal_thread);
+        element.appendChild(lower_nominal_thread);
+        element.appendChild(end_nominal_thread);
+        element.appendChild(end_nominal_thread_upper_champfer);
+        element.appendChild(end_nominal_thread_lower_champfer);
+    }
+
+    draw(element, draw_axis=true, draw_faces=true) {
+
+        this.draw_main_shape(element);
+        this.draw_base_thread(element);
+        this.draw_nominal_thread(element);
+
+        if (draw_faces)
+            this.draw_faces(element);
+
+        if(draw_axis)
+            this.draw_axis(element);
+    }
 };
 
-const nominal_diameter = 8;
-const base_diameter = 12;
-const base_lenght = 20;
-const nominal_lenght = 25;
-const axis_top = 250;
-const face_left = 800;
-const axis_overflow = 0;
-const thread_lenght = nominal_lenght - 7;
+function draw_stud() {
 
-create_stud(
-    nominal_diameter,
-    base_diameter,
-    base_lenght,
-    nominal_lenght,
-    thread_lenght,
-    axis_top,
-    face_left,
-    // axis_overflow
-);
+    let nominal_diameter = 8;
+    let base_diameter = 12;
+    let base_lenght = 20
+    let nominal_lenght = 30;
+    let thread_lenght = nominal_lenght - 5;
+    let withdrawal = 1;
+
+    let stud = new Stud(
+        nominal_diameter,
+        base_diameter,
+        base_lenght,
+        nominal_lenght,
+        thread_lenght,
+        withdrawal
+    )
+
+    stud.draw(frame);
+}
+
+draw_stud();
