@@ -1,19 +1,24 @@
 const svgNS = "http://www.w3.org/2000/svg";
 
-
-
 let frame = document.getElementById('frame');
 
-class Shape {
+class BaseShape {
     THREAD_OFFSET = 1;
-    SCALE = 30;
+    SCALE = 20;
     AXIS_TOP = 250;
     FACE_LEFT = 800;
     AXIS_OVERFLOW = 0;
     FACE_OVERFLOW = 20;
+    HOLE_OFFSET = 1;
+    NOMINAL_DIAMETER = 6;
+
+    constructor(){
+        this.HOLE_OFFSET *= this.SCALE;
+        this.NOMINAL_DIAMETER *= this.SCALE;
+    }
 }
 
-class Stud extends Shape {
+class Stud extends BaseShape {
 
     constructor(
         nominal_diameter,
@@ -202,11 +207,76 @@ class Stud extends Shape {
         element.appendChild(end_nominal_thread_lower_champfer);
     }
 
+    draw_implantation(element){
+        let face_left = this.FACE_LEFT;
+
+        const IMPL_DIAMETER = 13 * this.SCALE;
+        const IMPL_DEEP_LAMAGE = 5 * this.SCALE;
+        const IMPLE_CH_LENGHT = 2 * this.SCALE;
+        const IMPL_DEEP = 30 * this.SCALE;
+        const TIP_LENGHT = 1 * this.SCALE;
+
+        let points = [
+            [
+                face_left,
+                0,
+            ],
+            [
+                face_left,
+                this.AXIS_TOP - 0.5 * IMPL_DIAMETER,
+            ],
+            [
+                face_left - IMPL_DEEP_LAMAGE,
+                this.AXIS_TOP - 0.5 * IMPL_DIAMETER,
+            ],
+            [
+                face_left - IMPL_DEEP_LAMAGE - IMPLE_CH_LENGHT,
+                this.AXIS_TOP - 0.5 * this.base_diameter + this.THREAD_OFFSET * this.SCALE,
+            ],
+            [
+                face_left - IMPL_DEEP,
+                this.AXIS_TOP - 0.5 * this.base_diameter + this.THREAD_OFFSET * this.SCALE,
+            ],
+            [
+                face_left - IMPL_DEEP - TIP_LENGHT,
+                this.AXIS_TOP,
+            ],
+            [
+                face_left - IMPL_DEEP,
+                this.AXIS_TOP + 0.5 * this.base_diameter - this.THREAD_OFFSET * this.SCALE,
+            ],
+            [
+                face_left - IMPL_DEEP_LAMAGE - IMPLE_CH_LENGHT,
+                this.AXIS_TOP + 0.5 * this.base_diameter - this.THREAD_OFFSET * this.SCALE,
+            ],
+            [
+                face_left - IMPL_DEEP_LAMAGE,
+                this.AXIS_TOP + 0.5 * IMPL_DIAMETER,
+            ],
+            [
+                face_left,
+                this.AXIS_TOP + 0.5 * IMPL_DIAMETER,
+            ],
+            [
+                face_left,
+                100000,
+            ]
+        ];
+
+        // Définir l'attribut "points" de la polyline
+        let implantation = document.createElementNS(svgNS, "polyline");
+        implantation.setAttribute("points", points);
+        implantation.setAttribute("class", "stud");
+
+        element.appendChild(implantation);
+    }
+
     draw(element, draw_axis=true, draw_faces=true) {
 
         this.draw_main_shape(element);
         this.draw_base_thread(element);
         this.draw_nominal_thread(element);
+        this.draw_implantation(element);
 
         if (draw_faces)
             this.draw_faces(element);
@@ -216,10 +286,93 @@ class Stud extends Shape {
     }
 };
 
+class ThightenedPart extends BaseShape {
+
+    constructor(width, offset, class_name){
+
+        super();
+
+        this.class_name = class_name;
+        this.offset = offset * this.SCALE;
+        this.width = width * this.SCALE;
+    }
+
+    draw_upper_rect(element, height){
+
+        let P1 = [
+            this.FACE_LEFT + this.offset,
+            this.AXIS_TOP - 0.5 * height,
+        ];
+
+        let P2 = [
+            this.FACE_LEFT + this.offset,
+            this.AXIS_TOP - 0.5 * this.NOMINAL_DIAMETER - this.HOLE_OFFSET
+        ];
+
+        let P3 = [
+            this.FACE_LEFT + this.offset + this.width,
+            this.AXIS_TOP - 0.5 * this.NOMINAL_DIAMETER - this.HOLE_OFFSET,
+        ];
+
+        let P4 = [
+            this.FACE_LEFT + this.offset + this.width,
+            this.AXIS_TOP - 0.5 * height,
+        ];
+
+        let points = [P1, P2, P3, P4, P1];
+
+        // Définir l'attribut "points" de la polyline
+        let upper_rect = document.createElementNS(svgNS, "polyline");
+        upper_rect.setAttribute("points", points);
+        upper_rect.setAttribute("class", `part ${this.class_name}`);
+
+        element.appendChild(upper_rect);
+    }
+
+    draw_lower_rect(element, height){
+        let P1 = [
+            this.FACE_LEFT + this.offset,
+            this.AXIS_TOP + 0.5 * height,
+        ];
+
+        let P2 = [
+            this.FACE_LEFT + this.offset,
+            this.AXIS_TOP + 0.5 * this.NOMINAL_DIAMETER + this.HOLE_OFFSET
+        ];
+
+        let P3 = [
+            this.FACE_LEFT + this.offset + this.width,
+            this.AXIS_TOP + 0.5 * this.NOMINAL_DIAMETER + this.HOLE_OFFSET,
+        ];
+
+        let P4 = [
+            this.FACE_LEFT + this.offset + this.width,
+            this.AXIS_TOP + 0.5 * height,
+        ];
+
+        let points = [P1, P2, P3, P4, P1];
+
+        // Définir l'attribut "points" de la polyline
+        let upper_rect = document.createElementNS(svgNS, "polyline");
+        upper_rect.setAttribute("points", points);
+        upper_rect.setAttribute("class", `part ${this.class_name}`);
+
+        element.appendChild(upper_rect);
+    }
+
+    draw(element){
+
+        const HEIGHT = 20 * this.SCALE;
+
+        this.draw_upper_rect(element, HEIGHT);
+        this.draw_lower_rect(element, HEIGHT);
+    }
+}
+
 function draw_stud() {
 
-    let nominal_diameter = 8;
-    let base_diameter = 12;
+    let nominal_diameter = 6;
+    let base_diameter = 10;
     let base_lenght = 20
     let nominal_lenght = 30;
     let thread_lenght = nominal_lenght - 5;
@@ -234,7 +387,16 @@ function draw_stud() {
         withdrawal
     )
 
-    stud.draw(frame);
+    stud.draw(frame, true, false);
+}
+
+function draw_parts(){
+    let part1 = new ThightenedPart(5, 0, "part1")
+    let part2 = new ThightenedPart(5, 5, "part2")
+
+    part1.draw(frame);
+    part2.draw(frame);
 }
 
 draw_stud();
+draw_parts();

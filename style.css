@@ -8,7 +8,7 @@
     margin: 10px;
     box-sizing: border-box;
 
-    overflow: visible;
+    /* overflow: visible; */
     border: 1px solid #888;
 }
 
@@ -30,4 +30,11 @@
 
 .thread {
     stroke-width: 0.5;
+}
+
+.part {
+    /* stroke: blue;
+    fill: blue; */
+    fill-opacity: 0;
+    stroke: aliceblue;
 }
