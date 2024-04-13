@@ -12,8 +12,22 @@
     border: 1px solid #888;
 }
 
-#stud {
+.stud {
     stroke-width: 1px;
     stroke: aliceblue;
-    fill: none;
+    fill: #888;
+    fill-opacity: 0;
+}
+
+.stud:hover {
+    fill: blue;
+    fill-opacity: 0.2;
+}
+
+.stud.face {
+    stroke: red;
+}
+
+.thread {
+    stroke-width: 0.5;
 }
