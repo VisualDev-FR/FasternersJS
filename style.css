@@ -15,8 +15,10 @@
 .stud {
     stroke-width: 1px;
     stroke: aliceblue;
-    fill-opacity: 0;
+    fill: #2f2f2f;
+    fill-opacity: 1;
     /* visibility: hidden; */
+    z-index: 999;
 }
 
 .stud:hover {
@@ -28,8 +30,19 @@
     stroke: red;
 }
 
+.stud.nut{
+    fill: #2f2f2f;
+    fill-opacity: 1;
+}
+
 .thread {
     stroke-width: 0.5;
+}
+
+.stud.implantation {
+    stroke-width: 2;
+    stroke: rgb(0, 204, 255);
+    stroke-opacity: 0.4;
 }
 
 .part {
