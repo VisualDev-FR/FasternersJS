@@ -2,9 +2,13 @@
     background-color: #2f2f2f;
 }
 
+label{
+    color: aliceblue;
+}
+
 #frame {
     width: calc(100vw - 40px);
-    height: calc(100vh - 40px);
+    height: calc(100vh - 80px);
     margin: 10px;
     box-sizing: border-box;
 
@@ -16,7 +20,7 @@
     stroke-width: 1px;
     stroke: aliceblue;
     fill: #2f2f2f;
-    fill-opacity: 1;
+    fill-opacity: 0.6;
     /* visibility: hidden; */
     z-index: 999;
 }

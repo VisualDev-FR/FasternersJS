@@ -176,47 +176,57 @@ class Stud extends BaseShape {
 
         let face_left = this.FACE_LEFT - this.withdrawal;
 
-        let P1 = [
-            face_left,
-            this.AXIS_TOP - 0.5 * this.base_diameter
+        const ch_length = 1 * this.SCALE;
+
+        let points = [
+            [
+                face_left,
+                this.AXIS_TOP - 0.5 * this.base_diameter
+            ],
+            [
+                face_left,
+                this.AXIS_TOP - 0.5 * this.nominal_diameter
+            ],
+            [
+                face_left + this.nominal_lenght - ch_length,
+                this.AXIS_TOP - 0.5 * this.nominal_diameter,
+            ],
+            [
+                face_left + this.nominal_lenght,
+                this.AXIS_TOP - 0.5 * this.nominal_diameter + this.THREAD_OFFSET,
+            ],
+            [
+                face_left + this.nominal_lenght,
+                this.AXIS_TOP + 0.5 * this.nominal_diameter - this.THREAD_OFFSET,
+            ],
+            [
+                face_left + this.nominal_lenght - ch_length,
+                this.AXIS_TOP + 0.5 * this.nominal_diameter,
+            ],
+            [
+                face_left,
+                this.AXIS_TOP + 0.5 * this.nominal_diameter,
+            ],
+            [
+                face_left,
+                this.AXIS_TOP + 0.5 * this.base_diameter,
+            ],
+            [
+                face_left - this.base_lenght,
+                this.AXIS_TOP + 0.5 * this.base_diameter,
+            ],
+            [
+                face_left - this.base_lenght,
+                this.AXIS_TOP - 0.5 * this.base_diameter,
+            ],
+            [
+                face_left,
+                this.AXIS_TOP - 0.5 * this.base_diameter
+            ],
         ];
 
-        let P2 = [
-            face_left,
-            this.AXIS_TOP - 0.5 * this.nominal_diameter
-        ];
 
-        let P3 = [
-            face_left + this.nominal_lenght,
-            this.AXIS_TOP - 0.5 * this.nominal_diameter,
-        ];
 
-        let P4 = [
-            face_left + this.nominal_lenght,
-            this.AXIS_TOP + 0.5 * this.nominal_diameter,
-        ];
-
-        let P5 = [
-            face_left,
-            this.AXIS_TOP + 0.5 * this.nominal_diameter,
-        ];
-
-        let P6 = [
-            face_left,
-            this.AXIS_TOP + 0.5 * this.base_diameter,
-        ];
-
-        let P7 = [
-            face_left - this.base_lenght,
-            this.AXIS_TOP + 0.5 * this.base_diameter,
-        ];
-
-        let P8 = [
-            face_left - this.base_lenght,
-            this.AXIS_TOP - 0.5 * this.base_diameter,
-        ];
-
-        let points = [P1, P2, P3, P4, P5, P6, P7, P8, P1];
 
         // Définir l'attribut "points" de la polyline
         let main_shape = document.createElementNS(svgNS, "polyline");
@@ -445,7 +455,7 @@ class Nut extends BaseShape {
         this.face_left = this.FACE_LEFT + this.offset
     }
 
-    draw_faces(element){
+    draw_faces(element) {
 
         let face_left = this.face_left;
         let ext_champfer_h = this.ext_champfer_h;
@@ -501,13 +511,15 @@ class Nut extends BaseShape {
         element.appendChild(shape);
     }
 
-    draw_section_view(element){
+    draw_section_view(element) {
 
         let face_left = this.face_left;
 
+        const thread_pos = this.champfer < this.THREAD_OFFSET ? 0 : this.champfer - this.THREAD_OFFSET;
+
         let path = [
             `M ${face_left} ${this.AXIS_TOP - 0.5 * this.NOMINAL_DIAMETER + this.THREAD_OFFSET - this.champfer}`,
-            `L ${face_left + this.champfer} ${this.AXIS_TOP - 0.5 * this.NOMINAL_DIAMETER + this.THREAD_OFFSET} `,
+            `l ${this.champfer} ${this.champfer}`,
             `h ${this.height - 2 * this.champfer}`,
             `l ${this.champfer} ${- this.champfer}`,
 
@@ -522,13 +534,13 @@ class Nut extends BaseShape {
             `M ${face_left + this.height - this.champfer} ${this.AXIS_TOP - 0.5 * this.NOMINAL_DIAMETER + this.THREAD_OFFSET}`,
             `v ${this.NOMINAL_DIAMETER - 2 * this.THREAD_OFFSET}`,
 
-            `M ${face_left + this.height - this.champfer} ${this.AXIS_TOP - 0.5 * this.NOMINAL_DIAMETER + this.THREAD_OFFSET}`,
-            `m ${this.THREAD_OFFSET} -${this.THREAD_OFFSET}`,
-            `h ${-this.height + this.THREAD_OFFSET + this.THREAD_OFFSET}`,
+            `M ${face_left} ${this.AXIS_TOP - 0.5 * this.NOMINAL_DIAMETER}`,
+            `m ${thread_pos} ${0}`,
+            `h ${this.height - 2 * (thread_pos)}`,
 
-            `M ${face_left + this.height - this.champfer} ${this.AXIS_TOP + 0.5 * this.NOMINAL_DIAMETER + this.THREAD_OFFSET}`,
-            `m ${this.THREAD_OFFSET} -${this.THREAD_OFFSET}`,
-            `h ${-this.height + this.THREAD_OFFSET + this.THREAD_OFFSET}`,
+            `M ${face_left} ${this.AXIS_TOP + 0.5 * this.NOMINAL_DIAMETER}`,
+            `m ${thread_pos} ${0}`,
+            `h ${this.height - 2 * (thread_pos)}`,
         ]
 
         let section = document.createElementNS(svgNS, "path")
@@ -540,7 +552,7 @@ class Nut extends BaseShape {
         element.appendChild(section);
     }
 
-    draw(element){
+    draw(element) {
         this.draw_nut(element);
 
         if (this.section_wiew)
@@ -594,7 +606,7 @@ part2.draw(frame);
 // NUT
 let nut_height = 10;
 let nut_diameter = 15;
-let nut_champfer = 2;
+let nut_champfer = 1.5;
 let nut = new Nut(
     nut_height,
     P1_thick + P2_thick + 1,
@@ -603,14 +615,29 @@ let nut = new Nut(
     false,
 );
 
-if (nut.section_wiew){
+if (nut.section_wiew) {
     nut.draw(frame);
     stud.draw(frame, true, false);
 }
-else
-{
+else {
     stud.draw(frame, true, false);
     nut.draw(frame);
 }
 
+// CONTROLS
+var slider = document.getElementById("myRange");
+var output = document.getElementById("demo");
+output.innerHTML = slider.value; // Display the default slider value
 
+// Update the current slider value (each time you drag the slider handle)
+slider.oninput = function () {
+    let childs = frame.getElementsByClassName("stud");
+
+    for (let child of childs) {
+        frame.removeChild(child);
+    }
+
+    output.innerText = this.value / 10;
+    stud.withdrawal = this.value;
+    stud.draw(frame, true, false);
+}
